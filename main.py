@@ -13,6 +13,7 @@ os.environ["KMP_BLOCKTIME"] = "1"
 os.environ["KMP_SETTINGS"] = "1"
 os.environ["KMP_AFFINITY"] = "granularity=fine,verbose,compact,1,0"
 
+
 def interact_model(model_name='model', seed=99, nsamples=5, batch_size=5,
                     length=8, temperature=0, top_k=10, top_p=.85, models_dir=''):
 
@@ -32,15 +33,15 @@ def interact_model(model_name='model', seed=99, nsamples=5, batch_size=5,
     elif length > hparams.n_ctx:
         raise ValueError("Can't get samples longer than window size: %s" % hparams.n_ctx)
 
-    gpu_options = tf.GPUOptions(allow_growth=True)
-    config = tf.ConfigProto(intra_op_parallelism_threads=0, inter_op_parallelism_threads=0,
+    gpu_options = tf.compat.v1.GPUOptions(allow_growth=True)
+    config = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=0, inter_op_parallelism_threads=0,
                        allow_soft_placement=True, gpu_options=gpu_options)
 
-    with tf.Session(graph=tf.Graph(), config=config) as sess:
+    with tf.compat.v1.Session(graph=tf.Graph(), config=config) as sess:
 
-        context = tf.placeholder(tf.int32, [batch_size, None])
+        context = tf.compat.v1.placeholder(tf.int32, [batch_size, None])
         np.random.seed(seed)
-        tf.set_random_seed(seed)
+        tf.compat.v1.set_random_seed(seed)
 
         # p = tf.random.uniform((1,), minval=.68, maxval=.98, dtype=tf.dtypes.float32, name='random_p_logits')
         output = sample.sample_sequence(
@@ -50,7 +51,7 @@ def interact_model(model_name='model', seed=99, nsamples=5, batch_size=5,
             temperature=temperature, top_k=top_k, top_p=top_p
         )
 
-        saver = tf.train.Saver()
+        saver = tf.compat.v1.train.Saver()
         ckpt = tf.train.latest_checkpoint(os.path.join(models_dir, model_name))
         saver.restore(sess, ckpt)
 
