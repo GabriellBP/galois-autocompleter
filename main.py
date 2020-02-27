@@ -78,11 +78,11 @@ def interact_model(model_name='model', seed=99, nsamples=5, batch_size=5,
 
                 return Response(json.dumps({'result':predictions}), status=200, mimetype='application/json')
 
-        app = Flask(__name__)
-        api = Api(app)
-        api.add_resource(Autocomplete, '/autocomplete')
-
         if __name__ == '__main__':
-            app.run('0.0.0.0', port=3030, debug=True)
+            app = Flask(__name__)
+            api = Api(app)
+            api.add_resource(Autocomplete, '/autocomplete')
+            app.run('0.0.0.0', port=3030, debug=True, use_reloader=False)
+
 
 interact_model()
